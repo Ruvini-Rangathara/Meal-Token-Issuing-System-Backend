@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { HttpException, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Item } from './entities/item.entity';
 import { ItemController } from './controller/item.controller';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -19,4 +20,8 @@ import { ItemController } from './controller/item.controller';
   ],
   controllers: [ItemController],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    console.log('Connected to the database successfully');
+  }
+}
