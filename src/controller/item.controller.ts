@@ -17,6 +17,12 @@ export class ItemController {
       console.log("Calling Get all method")
       let items = await this.itemRepository.find();
       console.log("Items : ",items)
+
+      if (!items) {
+        throw new EatoException('Items not found', HttpStatus.NOT_FOUND,
+          { additionalData: items});
+      }
+
       return items;
     } catch (error) {
       console.error("Error getting items:", error);

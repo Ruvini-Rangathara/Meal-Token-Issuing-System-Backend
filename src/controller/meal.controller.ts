@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from '../entities/meal.entity';
 import { Repository } from 'typeorm';
+import { EatoException } from '../exception/EatoException';
 
 @Controller('meal')
 export class MealController {
@@ -18,6 +19,12 @@ export class MealController {
       console.log("Calling Get all method")
       let meals = await this.mealRepository.find();
       console.log("Meals : ",meals)
+
+      if(!meals){
+        throw new EatoException('Meals not found', HttpStatus.NOT_FOUND,),
+          { additionalData: meals};
+      }
+
       return meals;
     } catch (error) {
       console.error("Error getting meals:", error);
@@ -31,6 +38,12 @@ export class MealController {
       console.log("Calling Get one method")
       let meal = await this.mealRepository.findOne(id);
       console.log("Meal : ",meal)
+
+      if(!meal){
+        throw new EatoException('Meal not found', HttpStatus.NOT_FOUND,
+          { additionalData: meal});
+      }
+
       return meal;
     }catch (error) {
       console.error("Error getting meal:", error);
@@ -54,6 +67,12 @@ export class MealController {
       mealData.token = await this.generateToken();
       console.log("Token generated : ",mealData.token)
 
+      // validate meal
+      if(!await this.validateMeal(mealData)){
+        throw new EatoException('Please check your inputs', HttpStatus.BAD_REQUEST,
+          { additionalData: mealData});
+      }
+
       return savedMeal;
     } catch (error) {
       console.error("Error creating meal:", error);
@@ -72,6 +91,9 @@ export class MealController {
     return token;
   }
 
+  async validateMeal(mealData: Partial<Meal>): Promise<boolean> {
+    return !(!mealData.id || !mealData.token || !mealData.totalPrice || !mealData.itemsInMeal);
+  }
 
 }
 
