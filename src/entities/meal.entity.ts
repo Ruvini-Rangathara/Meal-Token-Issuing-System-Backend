@@ -7,10 +7,10 @@ export class Meal {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   token: string;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', nullable: true })
   totalPrice: number;
 
   @OneToMany(() => ItemInMeal, itemInMeal => itemInMeal.meal)

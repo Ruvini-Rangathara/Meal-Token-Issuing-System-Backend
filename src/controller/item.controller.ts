@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { Item } from '../entities/item.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EatoException } from '../exception/EatoException';
 
 @Controller('item')
 export class ItemController {
@@ -28,6 +29,12 @@ export class ItemController {
     try{
       console.log("Calling Get one method")
       let item = await this.itemRepository.findOne(id);
+
+      if(!item){
+        throw new EatoException('Item not found', HttpStatus.NOT_FOUND,
+          { additionalData: id});
+      }
+
       console.log("Item : ",item)
       return item;
     }catch (error) {
@@ -41,14 +48,21 @@ export class ItemController {
     try {
       console.log("Received request to create item:", itemData);
 
+      if(!await this.validateItem(itemData)){
+        throw new EatoException('Please check your inputs', HttpStatus.BAD_REQUEST,
+          { additionalData: itemData});
+      }
+
+      if (await this.itemRepository.findOne(itemData.id)) {
+        throw new EatoException('Item already exists', HttpStatus.CONFLICT,
+          { additionalData: itemData});
+      }
+
       // Create a new instance of Item with the provided data
       const newItem = this.itemRepository.create(itemData);
-
       // Save the new item to the database
       const savedItem = await this.itemRepository.save(newItem);
-
       console.log("Successfully created item:", savedItem);
-
       return savedItem;
     } catch (error) {
       console.error("Error creating item:", error);
@@ -61,15 +75,22 @@ export class ItemController {
     try {
       console.log("Received request to update item:", itemData);
 
+      if(!await this.validateItem(itemData)){
+        throw new EatoException('Please check your inputs', HttpStatus.BAD_REQUEST,
+          { additionalData: itemData});
+      }
+
+      if (!await this.itemRepository.findOne(id)) {
+        throw new EatoException('Item not found', HttpStatus.NOT_FOUND,
+          { additionalData: id});
+      }
+
       // Find the item with the provided ID
       const item = await this.itemRepository.findOne(id);
-
       // Merge the existing item with the new data
       this.itemRepository.merge(item, itemData);
-
       // Save the updated item to the database
       const updatedItem = await this.itemRepository.save(item);
-
       console.log("Successfully updated item:", updatedItem);
 
       return updatedItem;
@@ -88,6 +109,11 @@ export class ItemController {
       // Find the item with the provided ID
       const item = await this.itemRepository.findOne(id);
 
+      if (!item) {
+        throw new EatoException('Item not found', HttpStatus.NOT_FOUND,
+          { additionalData: id});
+      }
+
       // Delete the item from the database
       await this.itemRepository.remove(item);
 
@@ -96,6 +122,11 @@ export class ItemController {
       console.error("Error deleting item:", error);
       throw error;
     }
+  }
+
+
+  async validateItem(item: Partial<Item>): Promise<Boolean> {
+    return !!(item.name && item.price && item.id && item.picture);
   }
 
 }

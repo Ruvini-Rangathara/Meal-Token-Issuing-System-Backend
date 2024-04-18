@@ -3,6 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Item } from './entities/item.entity';
 import { ItemController } from './controller/item.controller';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { Meal } from './entities/meal.entity';
+import { ItemInMeal } from './entities/item-in-meal.entity';
+import { MealController } from './controller/meal.controller';
+import { ItemInMealController } from './controller/item-in-meal.controller';
 
 @Module({
   imports: [
@@ -13,12 +17,12 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
       username: 'postgres',
       password: '1234',
       database: 'eato',
-      entities: [Item],
+      entities: [Item, Meal, ItemInMeal],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([Item]),
+    TypeOrmModule.forFeature([Item, Meal, ItemInMeal]),
   ],
-  controllers: [ItemController],
+  controllers: [ItemController, MealController, ItemInMealController],
 })
 export class AppModule {
   constructor() {
