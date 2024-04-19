@@ -1,8 +1,14 @@
 import { HttpStatus } from '@nestjs/common';
 import { HttpException } from '@nestjs/common';
 
-export class Response extends HttpException {
+export class Response{
+  message: string;
+  statusCode: HttpStatus;
+  data: any;
+
   constructor(message: string, statusCode: HttpStatus, data?: any) {
-    super({ message, data }, statusCode);
+    this.message = message;
+    this.statusCode = statusCode;
+    this.data = data;
   }
 }

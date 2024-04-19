@@ -18,7 +18,6 @@ export class ItemService {
       console.log("Calling get all method in service")
       let items = await this.itemRepository.find();
       console.log("Find all items in service : ", items)
-
       //convert to DTO
       return items.map(item => new ItemDTO(item));
     } catch (error) {
