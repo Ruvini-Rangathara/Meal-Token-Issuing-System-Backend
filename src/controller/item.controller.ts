@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@ne
 import { Item } from '../entities/item.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EatoException } from '../exception/EatoException';
+import { EatoException } from '../exception/eato-exception';
 
 @Controller('item')
 export class ItemController {
