@@ -4,6 +4,7 @@ import { Meal } from '../entities/meal.entity';
 import { Repository } from 'typeorm';
 import { Response } from '../response/response';
 import { MealService } from '../service/meal.service';
+import { MealDTO } from '../dto/meal.dto';
 
 @Controller('meal')
 export class MealController {
@@ -43,7 +44,7 @@ export class MealController {
   }
 
   @Post()
-  async create(@Body() mealData: Partial<Meal>): Response {
+  async create(@Body() mealData: MealDTO): Response {
     try{
       if(await this.mealService.findOne(mealData.id)){
         return new Response(HttpStatus.CONFLICT, "Meal already exists", []);
