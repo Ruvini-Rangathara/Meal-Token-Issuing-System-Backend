@@ -18,9 +18,13 @@ export class MealService{
   async findAll(): Promise<MealDTO[]> {
     try {
       console.log("Calling get all method in service")
-      let items = await this.mealRepository.find();
-      console.log("Find all items in service : ", items)
-      return items.map(item => new MealDTO(item));
+      let meals = await this.mealRepository.find();
+      console.log("Find all items in service : ", meals)
+      let mealDto: MealDTO[] = [];
+      for (let meal of meals) {
+        mealDto.push(Convertor.convertToMealDTO(meal));
+      }
+      return mealDto;
     } catch (error) {
       console.error("Error getting items:", error);
       throw error;
@@ -31,40 +35,40 @@ export class MealService{
     try {
       console.log("Calling get one method in service")
       let meal = await this.mealRepository.findOne(id);
-      console.log("Find one item in service : ", meal)
-      return Convertor.convertToItemDTO(meal);
+      console.log("Find one meal in service : ", meal)
+      return Convertor.convertToMealDTO(meal);
     } catch (error) {
-      console.error("Error getting item:", error);
+      console.error("Error getting meal:", error);
       throw error;
     }
   }
 
-  async create(mealData: MealDTO): Promise<MealDTO> {
-    const entityManager = getManager();
-    try {
-      console.log("Received request to create item in service : ", mealData);
-      mealData.token = await this.generateToken();
-      console.log("Generated token : ",mealData.token);
-
-      // Start transaction
-      await entityManager.transaction(async transactionalEntityManager => {
-        // Create items in the meal
-        for (let i = 0; i < mealData.itemsInMeal.length; i++) {
-          await this.itemInMealService.create(mealData.itemsInMeal[i], transactionalEntityManager);
-        }
-
-        // Save meal
-        let meal = await transactionalEntityManager.save(Convertor.convertToItem(mealData));
-        console.log("Item created: ", meal);
-
-        return mealData;
-      });
-
-    } catch (error) {
-      console.error("Error creating item:", error);
-      throw error;
-    }
-  }
+  // async create(mealData: MealDTO): Promise<MealDTO> {
+  //   const entityManager = getManager();
+  //   try {
+  //     console.log("Received request to create item in service : ", mealData);
+  //     mealData.token = await this.generateToken();
+  //     console.log("Generated token : ",mealData.token);
+  //
+  //     // Start transaction
+  //     await entityManager.transaction(async transactionalEntityManager => {
+  //       // Create items in the meal
+  //       for (let i = 0; i < mealData.itemsInMeal.length; i++) {
+  //         await this.itemInMealService.create(mealData.itemsInMeal[i], transactionalEntityManager);
+  //       }
+  //
+  //       // Save meal
+  //       let meal = await transactionalEntityManager.save(Convertor.convertToMealDTO(mealData));
+  //       console.log("Meal created: ", meal);
+  //
+  //       return mealData;
+  //     });
+  //     return null;
+  //   } catch (error) {
+  //     console.error("Error creating item:", error);
+  //     throw error;
+  //   }
+  // }
 
   //generate token
   async generateToken(): Promise<string> {

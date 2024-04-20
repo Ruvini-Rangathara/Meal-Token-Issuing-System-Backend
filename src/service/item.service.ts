@@ -1,8 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from '../entities/item.entity';
 import { Repository } from 'typeorm';
-import { Response } from '../response/response';
-import { HttpStatus } from '@nestjs/common';
 import { ItemDTO } from '../dto/item.dto';
 import { Convertor } from '../util/convertor';
 
@@ -19,7 +17,12 @@ export class ItemService {
       let items = await this.itemRepository.find();
       console.log("Find all items in service : ", items)
       //convert to DTO
-      return items.map(item => new ItemDTO(item));
+      let itemDto: ItemDTO[] = [];
+      for (let item of items) {
+        itemDto.push(Convertor.convertToItemDTO(item));
+      }
+      // console.log("Find all items in service after converted to DTO : ", itemDto)
+      return itemDto;
     } catch (error) {
       console.error("Error getting items:", error);
       throw error;
@@ -28,15 +31,14 @@ export class ItemService {
 
   async findOne(id: any): Promise<ItemDTO> {
     try {
-      console.log("Calling get one method in service")
-      let item = await this.itemRepository.findOne(id);
-
-      if (!item) {
-        throw new Response('Item not found', HttpStatus.NOT_FOUND,
-          { additionalData: id });
+      console.log("Calling get one method in service : ", id)
+      const item = await this.itemRepository.query('SELECT * FROM item WHERE id = $1', [id]);
+      // console.log("Find one item in service : ", item[0])
+      if (!item[0]) {
+        return null;
       }
       //convert to DTO
-      return Convertor.convertToItemDTO(item);
+      return Convertor.convertToItemDTO(item[0]);
     } catch (error) {
       console.error("Error getting item:", error);
       throw error;
@@ -46,8 +48,9 @@ export class ItemService {
   async create(itemData: ItemDTO): Promise<ItemDTO> {
     try {
       console.log("Received request to create item in service : ", itemData);
-
-      let item = await this.itemRepository.save(Convertor.convertToItem(itemData));
+      let toItem = Convertor.convertToItem(itemData);
+      console.log("Converted item : ", toItem)
+      let item = await this.itemRepository.save(toItem);
       console.log("Item created : ", item)
       return item;
     } catch (error) {

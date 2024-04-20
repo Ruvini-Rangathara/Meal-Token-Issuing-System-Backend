@@ -5,7 +5,7 @@ export class Item {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('int')
+  @Column('numeric', { precision: 10, scale: 2 })
   price: number;
 
   @Column({ length: 100})

@@ -1,9 +1,8 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from '@nestjs/common';
-import { Item } from '../entities/item.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Response } from '../response/response';
+import { ItemDTO } from '../dto/item.dto';
 import { ItemService } from '../service/item.service';
+import * as sea from 'node:sea';
 
 @Controller('item')
 export class ItemController {
@@ -14,72 +13,76 @@ export class ItemController {
   }
 
   @Get()
-  async findAll(): Response {
-    let all = this.itemService.findAll();
+  async findAll(): Promise<Response> {
+    let all = await this.itemService.findAll();
     try{
       if (all) {
-        return new Response('Items found', HttpStatus.OK, all);
+        return new Response(HttpStatus.OK,'Items found',  all);
       } else {
-        return new Response('No items found', HttpStatus.NOT_FOUND);
+        return new Response( HttpStatus.NOT_FOUND, 'No items found',null);
       }
     }catch (e){
-      return new Response('An error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new Response( HttpStatus.INTERNAL_SERVER_ERROR, 'An error occurred',null);
     }
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: any): Response {
+  async findOne(@Param('id') id: any): Promise<Response>  {
+    console.log("Finding item in controller : ", id)
     try{
-      let item = this.itemService.findOne(id);
+      let item =await this.itemService.findOne(id);
       if (item) {
-        return new Response('Item found', HttpStatus.OK, item);
+        console.log("Item found in controller : ", item)
+        return new Response(HttpStatus.OK,'Item found',  item);
       } else {
-        return new Response('Item not found', HttpStatus.NOT_FOUND, null);
+        return new Response(HttpStatus.NOT_FOUND,'Item not found', null);
       }
     }catch (e){
-      return new Response('An error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new Response( HttpStatus.INTERNAL_SERVER_ERROR, 'An error occurred',null);
     }
-
   }
 
   @Post()
-  async create(@Body() itemData: Partial<Item>): Response{
+  async create(@Body() itemData: ItemDTO): Promise<Response> {
+    console.log("Creating item in controller : ", itemData)
     try{
-      if(await this.itemService.findOne(itemData.id)){
-        return new Response('Item already exists', HttpStatus.CONFLICT);
+      let search = await this.itemService.findOne(itemData.id);
+      console.log("Search result : ", search)
+      if(search != null){
+        return new Response(HttpStatus.CONFLICT,'Item already exists', itemData);
       }
 
       let itemDTO = this.itemService.create(itemData);
-      return new Response('Item created', HttpStatus.CREATED, itemDTO);
+      return new Response(HttpStatus.CREATED, 'Item created', itemDTO);
     }catch (e) {
-      return new Response('An error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new Response(HttpStatus.INTERNAL_SERVER_ERROR, 'An error occurred', null);
     }
   }
 
   @Put(':id')
-  async update(@Param('id') id: any, @Body() itemData: Partial<Item>): Response {
+  async update(@Param('id') id: any, @Body() itemData: ItemDTO): Promise<Response>  {
     try{
       if(!await this.itemService.findOne(id)){
-        return new Response('Item not found', HttpStatus.NOT_FOUND);
+        return new Response( HttpStatus.NOT_FOUND, 'Item not found',null);
       }
       let item = this.itemService.update(id, itemData);
-      return new Response('Item updated', HttpStatus.OK, item);
+      return new Response(HttpStatus.OK, 'Item updated', item);
     }catch (e){
-      return new Response('An error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new Response(HttpStatus.INTERNAL_SERVER_ERROR, 'An error occurred', null);
     }
   }
 
 
   @Delete(':id')
-  async remove(@Param('id') id: any): Promise<void> {
+  async remove(@Param('id') id: any): Promise<Response> {
     try{
       if(await this.itemService.findOne(id)){
-        return new Response('Item not found', HttpStatus.NOT_FOUND);
+        return new Response( HttpStatus.NOT_FOUND, 'Item not found',null);
       }
       let itemDTO = await this.itemService.delete(id);
-      return new Response('Item deleted', HttpStatus.OK, itemDTO);
+      return new Response( HttpStatus.OK,'Item deleted', itemDTO);
     }catch (e){
-      return new Response('An error occurred', HttpStatus.INTERNAL_SERVER_ERROR);
+      return new Response( HttpStatus.INTERNAL_SERVER_ERROR, 'An error occurred', null);
     }
   }
 

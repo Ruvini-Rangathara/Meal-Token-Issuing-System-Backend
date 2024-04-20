@@ -1,12 +1,13 @@
-import { HttpException, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Item } from './entities/item.entity';
-import { ItemController } from './controller/item.controller';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { Meal } from './entities/meal.entity';
 import { ItemInMeal } from './entities/item-in-meal.entity';
 import { MealController } from './controller/meal.controller';
-import { ItemInMealController } from './controller/item-in-meal.controller';
+import { ItemController } from './controller/item.controller';
+import { ItemService } from './service/item.service';
+import { MealService } from './service/meal.service';
+import { ItemInMealService } from './service/item-in-meal.service';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { ItemInMealController } from './controller/item-in-meal.controller';
     }),
     TypeOrmModule.forFeature([Item, Meal, ItemInMeal]),
   ],
-  controllers: [ItemController, MealController, ItemInMealController],
+  controllers: [ItemController, MealController],
+  providers:[ItemService, MealService, ItemInMealService],
 })
 export class AppModule {
   constructor() {

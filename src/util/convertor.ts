@@ -12,9 +12,14 @@ export class Convertor{
     meal.token = mealDto.token;
     meal.totalPrice = mealDto.totalPrice;
 
-    meal.itemsInMeal = mealDto.itemsInMeal.map(item => {
-      return new ItemInMeal(item.id, item.meal, item.item, item.price);
-    });
+    for (let itemInMealDto of mealDto.itemsInMeal) {
+      let itemInMeal = new ItemInMeal();
+      itemInMeal.id = itemInMealDto.id;
+      itemInMeal.meal = meal;
+      itemInMeal.item = itemInMealDto.item;
+      itemInMeal.price = itemInMealDto.price;
+      meal.itemsInMeal.push(itemInMeal);
+    }
     return meal;
   }
 
@@ -24,9 +29,14 @@ export class Convertor{
     mealDto.token = meal.token;
     mealDto.totalPrice = meal.totalPrice;
 
-    mealDto.itemsInMeal = meal.itemsInMeal.map(item => {
-      return new ItemInMealDTO(item.id, item.meal, item.item, item.price);
-    });
+    for (let itemInMeal of meal.itemsInMeal) {
+      let itemInMealDto = new ItemInMealDTO();
+      itemInMealDto.id = itemInMeal.id;
+      itemInMealDto.meal = mealDto;
+      itemInMealDto.item = itemInMeal.item;
+      itemInMealDto.price = itemInMeal.price;
+      mealDto.itemsInMeal.push(itemInMealDto);
+    }
     return mealDto;
   }
 
@@ -35,6 +45,7 @@ export class Convertor{
     itemDto.id = item.id;
     itemDto.name = item.name;
     itemDto.price = item.price;
+    itemDto.picture = item.picture;
     return itemDto;
   }
 
@@ -43,6 +54,7 @@ export class Convertor{
     item.id = itemDto.id;
     item.name = itemDto.name;
     item.price = itemDto.price;
+    item.picture = itemDto.picture;
     return item;
   }
 

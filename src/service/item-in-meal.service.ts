@@ -14,8 +14,9 @@ export class ItemInMealService {
   async findAllByMealId( mealId : any): Promise<ItemInMealDTO[]> {
     try{
       console.log("Calling get all by meal id method in service")
-      const items = await this.itemInMealRepository.find({ mealId: mealId });
-      return items.map(item => new ItemInMealDTO(item));
+      // let items = await this.itemInMealRepository.find({where:{meal:mealId}});
+      // return items.map(item => Convertor.convertToItemInMealDTO(item));
+      return null;
     }catch (error) {
       console.error("Error getting items:", error);
       throw error;
