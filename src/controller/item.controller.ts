@@ -66,7 +66,7 @@ export class ItemController {
         return new Response( HttpStatus.NOT_FOUND, 'Item not found',null);
       }
       let item = this.itemService.update(id, itemData);
-      return new Response(HttpStatus.OK, 'Item updated', item);
+      return new Response(HttpStatus.OK, 'Item updated', itemData);
     }catch (e){
       return new Response(HttpStatus.INTERNAL_SERVER_ERROR, 'An error occurred', null);
     }
@@ -76,8 +76,8 @@ export class ItemController {
   @Delete(':id')
   async remove(@Param('id') id: any): Promise<Response> {
     try{
-      if(await this.itemService.findOne(id)){
-        return new Response( HttpStatus.NOT_FOUND, 'Item not found',null);
+      if(!await this.itemService.findOne(id)){
+        return new Response( HttpStatus.NOT_FOUND, 'Item not found with id : '+id ,null);
       }
       let itemDTO = await this.itemService.delete(id);
       return new Response( HttpStatus.OK,'Item deleted', itemDTO);
