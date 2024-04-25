@@ -42,23 +42,23 @@ export class Convertor{
     return item;
   }
 
-  static convertToItemInMealDTO(itemInMeal: ItemInMeal): ItemInMealDTO {
-    return {
-      id: itemInMeal.id,
-      meal: itemInMeal.meal,
-      item: itemInMeal.item,
-      price: itemInMeal.price
-    };
-  }
-
-  static convertToItemInMeal(itemInMealDTO: ItemInMealDTO): ItemInMeal {
-    return {
-      id: itemInMealDTO.id,
-      meal: itemInMealDTO.meal,
-      item: itemInMealDTO.item,
-      price: itemInMealDTO.price
-    };
-  }
+  // static convertToItemInMealDTO(itemInMeal: ItemInMeal): ItemInMealDTO {
+  //   return {
+  //     id: itemInMeal.id,
+  //     meal: itemInMeal.meal,
+  //     item: itemInMeal.item,
+  //     price: itemInMeal.price
+  //   };
+  // }
+  //
+  // static convertToItemInMeal(itemInMealDTO: ItemInMealDTO): ItemInMeal {
+  //   return {
+  //     id: itemInMealDTO.id,
+  //     meal: itemInMealDTO.meal,
+  //     item: itemInMealDTO.item,
+  //     price: itemInMealDTO.price
+  //   };
+  // }
 
 
 }
