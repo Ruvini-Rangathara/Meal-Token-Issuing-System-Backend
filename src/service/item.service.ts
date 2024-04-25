@@ -59,19 +59,6 @@ export class ItemService {
     }
   }
 
-  // async update(id: any, itemData: ItemDTO): Promise<ItemDTO> {
-  //   try {
-  //     console.log("Received request to update item:", itemData);
-  //     let item = await this.findOne(id);
-  //     item = await this.itemRepository.merge( Convertor.convertToItem(itemData));
-  //     console.log("Item updated : ", item)
-  //     return itemData;
-  //   } catch (error) {
-  //     console.error("Error updating item:", error);
-  //     throw error;
-  //   }
-  // }
-
   async update(id: any, newData: ItemDTO): Promise<ItemDTO> {
     try {
       // First, retrieve the item you want to update

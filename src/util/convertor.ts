@@ -1,43 +1,27 @@
 import { MealDTO } from '../dto/meal.dto';
 import { Meal } from '../entities/meal.entity';
-import { ItemInMeal } from '../entities/item-in-meal.entity';
-import { ItemInMealDTO } from '../dto/item-in-meal.dto';
 import { Item } from '../entities/item.entity';
 import { ItemDTO } from '../dto/item.dto';
+import { ItemInMeal } from '../entities/item-in-meal.entity';
+import { ItemInMealDTO } from '../dto/item-in-meal.dto';
 
 export class Convertor{
   static convertToMeal(mealDto:MealDTO): Meal{
-    let meal = new Meal();
-    meal.id = mealDto.id;
-    meal.token = mealDto.token;
-    meal.totalPrice = mealDto.totalPrice;
-
-    for (let itemInMealDto of mealDto.itemsInMeal) {
-      let itemInMeal = new ItemInMeal();
-      itemInMeal.id = itemInMealDto.id;
-      itemInMeal.meal = meal;
-      itemInMeal.item = itemInMealDto.item;
-      itemInMeal.price = itemInMealDto.price;
-      meal.itemsInMeal.push(itemInMeal);
+    return {
+      id: mealDto.id,
+      token: mealDto.token,
+      totalPrice: mealDto.totalPrice,
+      itemsInMeal: []
     }
-    return meal;
   }
 
-  static convertToMealDTO(meal:Meal): MealDTO {
-    let mealDto = new MealDTO();
-    mealDto.id = meal.id;
-    mealDto.token = meal.token;
-    mealDto.totalPrice = meal.totalPrice;
-
-    for (let itemInMeal of meal.itemsInMeal) {
-      let itemInMealDto = new ItemInMealDTO();
-      itemInMealDto.id = itemInMeal.id;
-      itemInMealDto.meal = mealDto;
-      itemInMealDto.item = itemInMeal.item;
-      itemInMealDto.price = itemInMeal.price;
-      mealDto.itemsInMeal.push(itemInMealDto);
-    }
-    return mealDto;
+  static convertToMealDTO(meal: Meal): MealDTO {
+    return {
+      id: meal.id,
+      token: meal.token,
+      totalPrice: meal.totalPrice,
+      itemsInMeal: []
+    };
   }
 
   static convertToItemDTO(item:Item): ItemDTO {
@@ -58,4 +42,23 @@ export class Convertor{
     return item;
   }
 
+  static convertToItemInMealDTO(itemInMeal: ItemInMeal): ItemInMealDTO {
+    return {
+      id: itemInMeal.id,
+      meal: itemInMeal.meal,
+      item: itemInMeal.item,
+      price: itemInMeal.price
+    };
   }
+
+  static convertToItemInMeal(itemInMealDTO: ItemInMealDTO): ItemInMeal {
+    return {
+      id: itemInMealDTO.id,
+      meal: itemInMealDTO.meal,
+      item: itemInMealDTO.item,
+      price: itemInMealDTO.price
+    };
+  }
+
+
+}
