@@ -128,9 +128,15 @@ export class MealService{
     try {
       for (const id of idArray) {
         console.log("Updating meal id:", mealId, " for item in meal id:", id);
-        const query = `UPDATE item_in_meal SET "mealId" = $1 WHERE id = $2;`;
-        const values = [mealId, id];
-        await this.itemInMealRepository.query(query, values);
+
+        await this.itemInMealRepository.query(
+          'UPDATE item_in_meal SET "mealId" = $1 WHERE id = $2 RETURNING *',
+          [mealId, id]);
+
+        // let meal = new Meal();
+        // meal.id = mealId;
+        // let updateResult = await this.itemInMealRepository.update(id, { meal: meal });
+        // console.log("Update result:", updateResult);
       }
       return true;
     } catch (error) {
