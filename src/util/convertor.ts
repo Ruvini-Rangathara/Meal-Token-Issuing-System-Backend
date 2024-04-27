@@ -2,10 +2,9 @@ import { MealDTO } from '../dto/meal.dto';
 import { Meal } from '../entities/meal.entity';
 import { Item } from '../entities/item.entity';
 import { ItemDTO } from '../dto/item.dto';
-import { ItemInMeal } from '../entities/item-in-meal.entity';
-import { ItemInMealDTO } from '../dto/item-in-meal.dto';
 
 export class Convertor{
+
   static convertToMeal(mealDto:MealDTO): Meal{
     return {
       id: mealDto.id,
@@ -42,23 +41,4 @@ export class Convertor{
     return item;
   }
 
-  // static convertToItemInMealDTO(itemInMeal: ItemInMeal): ItemInMealDTO {
-  //   return {
-  //     id: itemInMeal.id,
-  //     meal: itemInMeal.meal,
-  //     item: itemInMeal.item,
-  //     price: itemInMeal.price
-  //   };
-  // }
-  //
-  // static convertToItemInMeal(itemInMealDTO: ItemInMealDTO): ItemInMeal {
-  //   return {
-  //     id: itemInMealDTO.id,
-  //     meal: itemInMealDTO.meal,
-  //     item: itemInMealDTO.item,
-  //     price: itemInMealDTO.price
-  //   };
-  // }
-
-
-}
+  }

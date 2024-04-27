@@ -3,7 +3,7 @@ import { ItemDTO } from './item.dto';
 import { IsNumber } from 'class-validator';
 
 export class ItemInMealDTO {
-  @IsNumber()
+
   id: number;
 
   meal: MealDTO;

@@ -2,54 +2,71 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from '../entities/meal.entity';
 import { DataSource, Repository } from 'typeorm';
 import { MealDTO } from '../dto/meal.dto';
-import { Convertor } from '../util/convertor';
-import { ItemInMealService } from './item-in-meal.service';
 import { Item } from '../entities/item.entity';
 import { ItemInMeal } from '../entities/item-in-meal.entity';
+import { Convertor } from '../util/convertor';
+import { FindItemInMealDTO } from '../dto/find-item-in-meal.dto';
+import { FindMealDTO } from '../dto/find-meal.dto';
 
-export class MealService{
+export class MealService {
 
   constructor(
     @InjectRepository(Meal)
     private readonly mealRepository: Repository<Meal>,
-    private readonly itemInMealService: ItemInMealService,
     @InjectRepository(Item)
     private readonly itemRepository: Repository<Item>,
     @InjectRepository(ItemInMeal)
     private readonly itemInMealRepository: Repository<ItemInMeal>,
-
-    private readonly datasource: DataSource
+    private readonly datasource: DataSource,
   ) {
   }
 
   async findAll(): Promise<MealDTO[]> {
     try {
-      console.log("Calling get all method in service")
+      console.log('Calling get all method in meal service');
       let meals = await this.mealRepository.find();
-      // console.log("Find all meals in service : ", meals)
       let mealDto: MealDTO[] = [];
       for (let meal of meals) {
         mealDto.push(Convertor.convertToMealDTO(meal));
       }
-      // console.log("Find all mealDTOs in service : ", mealDto)
       return mealDto;
     } catch (error) {
-      console.error("Error getting meals:", error);
       throw error;
     }
   }
 
-  async findOne(id: any): Promise<MealDTO> {
+  async findOne(mealId: any): Promise<FindMealDTO> {
     try {
-      console.log("Calling get one method in service : ", id);
-      const meal = await this.mealRepository.query('SELECT * FROM meal WHERE id = $1', [id]);
+      console.log('Calling find by id method in meal service : ', mealId);
+      const meal = await this.mealRepository.query('SELECT * FROM meal WHERE id = $1', [mealId]);
+      let newVar = await this.itemInMealRepository.query('SELECT * FROM item_in_meal WHERE "mealId" = $1', [mealId]);
+      await this.datasource.query('COMMIT');
+
+      let findItemInMeal: FindItemInMealDTO[] = [];
+      // find all item according to item id in item in meal
+
+      let findMealDTO = new FindMealDTO();
+      for (let itemInMeal of newVar) {
+        let { id, price,mealId, itemId } = itemInMeal;
+        let item = await this.itemRepository.query('SELECT * FROM item WHERE id = $1', [itemId]);
+        let dto  = new FindItemInMealDTO();
+        dto.item = Convertor.convertToItemDTO(item[0]);
+        dto.id = id;
+        dto.price = price;
+        findItemInMeal.push(dto);
+      }
+
+      findMealDTO.id = meal[0].id;
+      findMealDTO.token = meal[0].token;
+      findMealDTO.totalPrice = meal[0].totalPrice;
+      findMealDTO.findItemInMeal = findItemInMeal;
+
       if (!meal[0]) {
         return null;
       }
-      // Convert to DTO
-      return Convertor.convertToMealDTO(meal[0]);
+      return findMealDTO;
     } catch (error) {
-      console.error("Error getting meal:", error);
+      console.log("Error : ", error)
       throw error;
     }
   }
@@ -57,56 +74,42 @@ export class MealService{
   async create(mealData): Promise<any> {
     const queryRunner = this.datasource.createQueryRunner();
     try {
+      console.log('Calling create method in meal service : ', mealData);
+
       await queryRunner.connect();
       await queryRunner.startTransaction();
-
-      console.log("Received meal : ", mealData);
 
       const newMeal = new Meal(); // Create an instance of the Meal entity
       newMeal.token = await this.generateToken();
       newMeal.totalPrice = mealData.totalPrice;
 
-      // Save the new Meal entity (insert operation)
-      // const savedMeal = await queryRunner.manager.save(newMeal);
+      console.log('New meal : ', newMeal);
 
-      const mealQuery = `INSERT INTO meal (token, "totalPrice") VALUES ($1, $2) RETURNING *;`;
-      const mealValues = [newMeal.token, newMeal.totalPrice];
+      const savedMeal = await this.mealRepository.query(
+        `INSERT INTO meal (token, "totalPrice")
+         VALUES ($1, $2) RETURNING *;`,
+        [newMeal.token, newMeal.totalPrice]);
 
-      const savedMeal = await this.mealRepository.query(mealQuery, mealValues);
-      console.log("Saved meal:", savedMeal[0]); // Assuming the query returns an array
-
-      let idArray:number[] = [];
+      let idArray: number[] = [];
       for (let itemData of mealData.itemsInMeal) {
-        // Assuming itemData contains mealId and itemId properties
-        const { mealId, itemId, price } = itemData;
+        const { itemId, price } = itemData;
 
         // Retrieve Item entity based on itemId
         const item = await this.itemRepository.query('SELECT * FROM item WHERE id = $1', [itemId]);
 
-        // Create a new ItemInMeal entity
         const newItemInMeal = new ItemInMeal();
         newItemInMeal.meal = null; // Set the reference to the saved Meal entity
         newItemInMeal.item = item;
         newItemInMeal.price = price;
 
-        // Save the new ItemInMeal entity
-        console.log("Saving new ItemInMeal entity: ", newItemInMeal);
-        // await this.itemInMealRepository.save(newItemInMeal);
-
-        const query = `INSERT INTO item_in_meal (price, "mealId", "itemId") VALUES ($1, $2, $3) RETURNING *;`;
-        const values = [newItemInMeal.price, null, itemId];
-
-        const insertedItem = await this.itemRepository.query(query, values);
+        const insertedItem = await this.itemRepository.query(
+          `INSERT INTO item_in_meal (price, "mealId", "itemId")
+           VALUES ($1, $2, $3) RETURNING *;`,
+          [newItemInMeal.price, null, itemId]);
         idArray.push(insertedItem[0].id);
-        console.log("Inserted item:", insertedItem[0]); // Assuming the query returns an array
       }
-      console.log("ItemInMeal created : ", savedMeal);
-      console.log("ItemInMeal id array : ", idArray);
-      let result = [savedMeal[0], idArray];
-      console.log("Result : ", result);
-      return result;
+      return [savedMeal[0], idArray];
     } catch (error) {
-      console.error("Error creating meal:", error);
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
@@ -119,32 +122,22 @@ export class MealService{
     // generate token with today date and time and random number, start with EATO-
     //example : EATO-20210802-221
     // 20210802 is date and 221 is random number
-    let token = "EATO-" + new Date().toISOString().split('T')[0].replace(/-/g,"") +"-"+ Math.floor(Math.random() * 1000);
-    console.log("Generated token : ",token)
-    return token;
+    return 'EATO-' + new Date().toISOString().split('T')[0].replace(/-/g, '') + '-' + Math.floor(Math.random() * 1000);
   }
 
   async updateMealId(mealId: number, idArray: number[]): Promise<boolean> {
     try {
-      for (const id of idArray) {
-        console.log("Updating meal id:", mealId, " for item in meal id:", id);
-
-        await this.itemInMealRepository.query(
+      for (let id of idArray) {
+        let newVar = await this.itemInMealRepository.query(
           'UPDATE item_in_meal SET "mealId" = $1 WHERE id = $2 RETURNING *',
           [mealId, id]);
-
-        // let meal = new Meal();
-        // meal.id = mealId;
-        // let updateResult = await this.itemInMealRepository.update(id, { meal: meal });
-        // console.log("Update result:", updateResult);
+        await this.datasource.query('COMMIT');
       }
       return true;
     } catch (error) {
-      console.error("Error updating meal id:", error);
       throw error;
     }
   }
-
 
 
 }

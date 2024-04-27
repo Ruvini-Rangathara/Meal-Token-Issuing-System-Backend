@@ -7,7 +7,6 @@ import { MealController } from './controller/meal.controller';
 import { ItemController } from './controller/item.controller';
 import { ItemService } from './service/item.service';
 import { MealService } from './service/meal.service';
-import { ItemInMealService } from './service/item-in-meal.service';
 
 @Module({
   imports: [
@@ -24,7 +23,7 @@ import { ItemInMealService } from './service/item-in-meal.service';
     TypeOrmModule.forFeature([Item, Meal, ItemInMeal]),
   ],
   controllers: [ItemController, MealController],
-  providers:[ItemService, MealService, ItemInMealService],
+  providers:[ItemService, MealService],
 })
 export class AppModule {
   constructor() {

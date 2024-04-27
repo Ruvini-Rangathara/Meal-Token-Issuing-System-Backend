@@ -1,4 +1,3 @@
-// meal.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ItemInMeal } from './item-in-meal.entity';
 
