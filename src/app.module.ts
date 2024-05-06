@@ -7,36 +7,31 @@ import { MealController } from './controller/meal.controller';
 import { ItemController } from './controller/item.controller';
 import { ItemService } from './service/item.service';
 import { MealService } from './service/meal.service';
-import * as process from 'node:process';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(
-
-      {
+    ConfigModule.forRoot({
+      envFilePath: '.env', isGlobal: true,
+    }),
+    TypeOrmModule.forRoot({
       type: 'postgres',
-
-      // port: 5432,
-      // database: 'eato_0bo6',
-      // host: 'dpg-coscdai1hbls73fi5ji0-a',
-      // password: 'mBus4ghoBmrIAMIiNHFoS1xS2KNQZRcR',
-      // username: 'root',
-        url: 'postgres://root:mBus4ghoBmrIAMIiNHFoS1xS2KNQZRcR@dpg-coscdai1hbls73fi5ji0-a.oregon-postgres.render.com/eato_0bo6',
-
-        // url: String(process.env.PG_URL),
-
-        ssl: { rejectUnauthorized: false },
-
-        entities: [Item, Meal, ItemInMeal],
+      host: process.env.DATABASE_HOST,
+      username: process.env.DATABASE_USER,
+      password: String(process.env.DATABASE_PASSWORD),
+      database: process.env.DATABASE_NAME,
+      ssl: {
+        rejectUnauthorized: false
+      },
+      entities: [Item, Meal, ItemInMeal],
       synchronize: true,
-        logging: true,
-    }
-    ),
-    TypeOrmModule.forFeature([Item, Meal, ItemInMeal]),
-  ],
+      logging: true,
+  }),
+    TypeOrmModule.forFeature([Item, Meal, ItemInMeal])],
   controllers: [ItemController, MealController],
-  providers:[ItemService, MealService],
+  providers: [ItemService, MealService],
 })
+
 export class AppModule {
   constructor() {
     console.log('Connected to the database successfully');
