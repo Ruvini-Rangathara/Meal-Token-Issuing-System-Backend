@@ -7,19 +7,31 @@ import { MealController } from './controller/meal.controller';
 import { ItemController } from './controller/item.controller';
 import { ItemService } from './service/item.service';
 import { MealService } from './service/meal.service';
+import * as process from 'node:process';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
+    TypeOrmModule.forRoot(
+
+      {
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '1234',
-      database: 'eato',
-      entities: [Item, Meal, ItemInMeal],
+
+      // port: 5432,
+      // database: 'eato_0bo6',
+      // host: 'dpg-coscdai1hbls73fi5ji0-a',
+      // password: 'mBus4ghoBmrIAMIiNHFoS1xS2KNQZRcR',
+      // username: 'root',
+        url: 'postgres://root:mBus4ghoBmrIAMIiNHFoS1xS2KNQZRcR@dpg-coscdai1hbls73fi5ji0-a.oregon-postgres.render.com/eato_0bo6',
+
+        // url: String(process.env.PG_URL),
+
+        ssl: { rejectUnauthorized: false },
+
+        entities: [Item, Meal, ItemInMeal],
       synchronize: true,
-    }),
+        logging: true,
+    }
+    ),
     TypeOrmModule.forFeature([Item, Meal, ItemInMeal]),
   ],
   controllers: [ItemController, MealController],

@@ -60,4 +60,3 @@ INSERT INTO item_in_meal ("mealId", "itemId", price) VALUES
                                                      (6, 2, 1000),
                                                      (6, 4, 400),
                                                      (6, 6, 800);
-
