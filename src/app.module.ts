@@ -21,9 +21,9 @@ import * as process from 'node:process';
       // host: 'dpg-coscdai1hbls73fi5ji0-a',
       // password: 'mBus4ghoBmrIAMIiNHFoS1xS2KNQZRcR',
       // username: 'root',
-        url: 'postgres://root:mBus4ghoBmrIAMIiNHFoS1xS2KNQZRcR@dpg-coscdai1hbls73fi5ji0-a.oregon-postgres.render.com/eato_0bo6',
+      //   url: 'postgres://root:mBus4ghoBmrIAMIiNHFoS1xS2KNQZRcR@dpg-coscdai1hbls73fi5ji0-a.oregon-postgres.render.com/eato_0bo6',
 
-        // url: String(process.env.PG_URL),
+        url: String(process.env.PG_URL),
 
         ssl: { rejectUnauthorized: false },
 
