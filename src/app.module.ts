@@ -9,6 +9,9 @@ import { ItemService } from './service/item.service';
 import { MealService } from './service/meal.service';
 import * as process from 'node:process';
 import { ConfigModule } from '@nestjs/config';
+import { Employee } from './entities/employee.entity';
+import { EmployeeController } from './controller/employee.controller';
+import { EmployeeService } from './service/employee.service';
 
 @Module({
   imports: [
@@ -20,15 +23,15 @@ import { ConfigModule } from '@nestjs/config';
       type: 'postgres',
         url: String(process.env.PG_URL),
         ssl: { rejectUnauthorized: false },
-        entities: [Item, Meal, ItemInMeal],
+        entities: [Item, Meal, ItemInMeal, Employee],
       synchronize: true,
         logging: true,
     }
     ),
-    TypeOrmModule.forFeature([Item, Meal, ItemInMeal]),
+    TypeOrmModule.forFeature([Item, Meal, ItemInMeal, Employee]),
   ],
-  controllers: [ItemController, MealController],
-  providers:[ItemService, MealService],
+  controllers: [ItemController, MealController, EmployeeController],
+  providers:[ItemService, MealService, EmployeeService],
 })
 export class AppModule {
   constructor() {
