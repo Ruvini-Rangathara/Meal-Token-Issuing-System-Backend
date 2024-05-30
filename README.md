@@ -39,17 +39,24 @@ src/
 The backend provides the following API endpoints for interaction with the frontend:
 
 1. **Items API**: CRUD operations for managing food items.
-    - `GET /api/item`
-    - `POST /api/item`
-    - `GET /api/item/:id`
-    - `PUT /api/item/:id`
-    - `DELETE /api/item/:id`
+    - `GET /item`
+    - `POST /item`
+    - `GET /item/:id`
+    - `PUT /item/:id`
+    - `DELETE /item/:id`
    
 
 2. **Meals API**: CRUD operations for managing meals.
-    - `GET /api/meals`
-    - `POST /api/meals`
-    - `GET /api/meals/:id`
+    - `GET /meals`
+    - `POST /meals`
+    - `GET /meals/:id`
+
+3**Employee API**: CRUD operations for managing employees.
+   - `GET /employee`
+   - `GET /employee/:emp_no`
+   - `POST /employee`
+   - `PUT /employee/:emp_no`
+   - `DELETE /employee/:emp_no`
 
 
 
